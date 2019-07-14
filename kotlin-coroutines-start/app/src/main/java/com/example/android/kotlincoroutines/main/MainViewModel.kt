@@ -19,7 +19,13 @@ package com.example.android.kotlincoroutines.main
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.android.kotlincoroutines.util.BACKGROUND
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * MainViewModel designed to store and manage UI-related data in a lifecycle conscious way. This
@@ -29,6 +35,8 @@ import com.example.android.kotlincoroutines.util.BACKGROUND
  */
 class MainViewModel : ViewModel() {
 
+    private val viewModelJob = Job()
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
     /**
      * Request a snackbar to display a string.
      *
@@ -49,9 +57,8 @@ class MainViewModel : ViewModel() {
      * Wait one second then display a snackbar.
      */
     fun onMainViewClicked() {
-        // TODO: Replace with coroutine implementation
-        BACKGROUND.submit {
-            Thread.sleep(1_000)
+        viewModelScope.launch {
+            delay(1_000)
             // use postValue since we're in a background thread
             _snackBar.postValue("Hello, from threads!")
         }
