@@ -2,7 +2,14 @@ package com.example.android.kotlincoroutines.main
 
 import android.content.Context
 import androidx.test.core.app.ApplicationProvider
+import androidx.work.ListenableWorker.Result
+import androidx.work.testing.TestListenableWorkerBuilder
+import com.example.android.kotlincoroutines.util.DefaultErrorDecisionStrategy
+import com.example.android.kotlincoroutines.util.ErrorDecisionStrategy
+import org.hamcrest.CoreMatchers.`is`
+import org.junit.Assert.assertThat
 import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
@@ -14,6 +21,15 @@ class RefreshMainDataWorkTest {
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
 
-        Defau
+        DefaultErrorDecisionStrategy.delegate = object : ErrorDecisionStrategy {
+            override fun shouldError(): Boolean = false
+        }
+    }
+
+    @Test
+    fun testRefreshMainDataWork() {
+        val worker = TestListenableWorkerBuilder<RefreshMainDataWork>(context).build()
+        val result = worker.startWork().get()
+        assertThat(result, `is`(Result.success()))
     }
 }
